@@ -1,15 +1,21 @@
 import React, {useEffect, useState} from 'react';
-import { View, TextInput, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import Voice from '@react-native-voice/voice'
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
+import Voice from '@react-native-voice/voice';
 
 const Home = () => {
   const [inputText, setInputText] = useState<string>('');
-  const [micActive, setmicActive] = useState<true | false>(false)
-  const [showMic, setshowMic] = useState<true | false>(true)
+  const [micActive, setmicActive] = useState<true | false>(false);
+  const [showMic, setshowMic] = useState<true | false>(true);
 
-  const [isListening, setisListening] = useState(false)
-  const [messages, setmessages] = useState([])
-  const [RecognizedSpeech, setRecognizedSpeech] = useState('')
+  const [isListening, setisListening] = useState(false);
+  const [RecognizedSpeech, setRecognizedSpeech] = useState('');
 
   useEffect(() => {
     Voice.onSpeechStart = onSpeechStart;
@@ -17,117 +23,82 @@ const Home = () => {
     Voice.onSpeechResults = onSpeechResults;
     Voice.onSpeechError = error => {
       console.log('onSpeechError', error);
-      setisListening(false)
-
-    }
-
+      setisListening(false);
+    };
 
     return () => {
-      Voice.destroy().then(Voice.removeAllListeners)
-      setisListening(false)
-    }
-  }, [])
-  const onSpeechStart = (event:any) => {
-    console.log("Recording Started ...",event)
+      Voice.destroy().then(Voice.removeAllListeners);
+      setisListening(false);
+    };
+  }, []);
 
-  }
+  const onSpeechStart = (event: any) => {
+    console.log('Recording Started ...', event);
+  };
+
   const onSpeechResults = (event: any) => {
     const text = event.value[0];
-    console.log("Results", text)
+    console.log('Results', text);
 
-    setRecognizedSpeech(text)
-    setInputText(text)
+    setRecognizedSpeech(text);
+    setInputText(text);
     if (text.length > 0) {
-      setshowMic(false)
+      setshowMic(false);
     }
+  };
 
-
-  }
-
-  const startListening = async() => {
+  const startListening = async () => {
     setisListening(true);
     try {
       await Voice.start('en-US');
     } catch (error) {
-      console.log("Yo")
+      console.log('Yo');
     }
-  }
+  };
 
   const stopListening = async () => {
     setisListening(false);
     try {
       Voice.removeAllListeners();
-      await Voice.stop()
-
+      await Voice.stop();
     } catch (error) {
-      console.log("Got errors in StopListening", error)
-
-
+      console.log('Got errors in StopListening', error);
     }
+  };
 
-  }
-
-  const handleTextChange = (text:string) => {
-    if (text.length == 0) {
-
-      setshowMic(true)
+  const handleTextChange = (text: string) => {
+    if (text.length === 0) {
+      setshowMic(true);
     } else {
-      setshowMic(false)
+      setshowMic(false);
     }
     setInputText(text);
-
-  }
-
+  };
 
   const handleMicPress = () => {
-    setmicActive(!micActive)
-  }
+    setmicActive(!micActive);
+  };
 
   return (
     <View style={styles.container}>
-      <View style={{flexDirection: 'column', flex: 0.09}}>
-        <View style={styles.headerContainer}>
-          <TouchableOpacity
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginLeft: 5,
-              marginTop: '5%',
-            }}>
-            <Image
-              style={{
-                height: 35,
-                width: 35,
-              }}
-              source={require('../assets/menu1.png')}
-            />
-          </TouchableOpacity>
-          <Text
-            style={{
-              fontSize: 25,
-              fontWeight: '700',
-              color: 'white',
-              marginTop: '5%',
-            }}>
-            L I M O
-          </Text>
-          <TouchableOpacity
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginRight: 5,
-              marginTop: '5%',
-            }}>
-            <Image
-              style={{height: 35, width: 35}}
-              source={require('../assets/threeDotMenu.png')}
-            />
-          </TouchableOpacity>
-        </View>
+      <View style={styles.headerContainer}>
+        <TouchableOpacity style={styles.menuButton}>
+          <Image
+            style={styles.menuIcon}
+            source={require('../assets/menu1.png')}
+          />
+        </TouchableOpacity>
+        <Text style={styles.logoText}>L I M O</Text>
+        <TouchableOpacity style={styles.menuButton}>
+          <Image
+            style={styles.menuIcon}
+            source={require('../assets/threeDotMenu.png')}
+          />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.inputContainer}>
-        <View style={{flexDirection: 'row'}}>
+        <View style={styles.inputRow}>
           <TextInput
             placeholder={
               isListening ? 'Listening .......' : 'Start Typing Here'
@@ -138,23 +109,18 @@ const Home = () => {
             value={inputText}
             textAlignVertical="top"
             autoFocus={true}
-            // numberOfLines={4}
             multiline={true}
             underlineColorAndroid={'transparent'}
             onChangeText={text => handleTextChange(text)}
           />
-          <View style={{flexDirection:'row',alignContent:'space-between',justifyContent:'space-between'}}>
+          <View style={styles.buttonContainer}>
             <TouchableOpacity
               onPress={() => {
                 isListening ? stopListening() : startListening();
               }}
-              style={{
-                borderRadius: 20,
-                marginBottom: 10,
-                alignSelf: 'center',
-              }}>
+              style={styles.micButton}>
               <Image
-                style={{height: 35, width: 35}}
+                style={styles.micIcon}
                 source={
                   showMic
                     ? isListening
@@ -164,15 +130,9 @@ const Home = () => {
                 }
               />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                borderRadius: 20,
-                marginBottom: 10,
-                marginLeft: '3%',
-                alignSelf: 'center',
-              }}>
+            <TouchableOpacity style={styles.galleryButton}>
               <Image
-                style={{height: 35, width: 35}}
+                style={styles.galleryIcon}
                 source={require('../assets/gallery.png')}
               />
             </TouchableOpacity>
@@ -190,21 +150,54 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   headerContainer: {
-    justifyContent: 'space-between',
     flexDirection: 'row',
-
+    justifyContent: 'space-between',
     alignItems: 'center', // Center vertically
+    marginTop: '5%',
   },
-  line: {
-    backgroundColor: 'grey',
-    height: 2,
-    alignSelf: 'stretch', // Take full width
-    marginHorizontal: 10, // Adjuset the margin as needed
-    marginVertical: 10,
-    borderRadius: 50,
+  menuButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 5,
+  },
+  menuIcon: {
+    height: 35,
+    width: 35,
+  },
+  logoText: {
+    fontSize: 25,
+    fontWeight: '700',
+    color: 'white',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    alignContent: 'space-between',
+    justifyContent: 'space-between',
+  },
+  micButton: {
+    borderRadius: 20,
+    marginBottom: 10,
+    alignSelf: 'center',
+  },
+  micIcon: {
+    height: 35,
+    width: 35,
+  },
+  galleryButton: {
+    borderRadius: 20,
+    marginBottom: 10,
+    marginLeft: '3%',
+    alignSelf: 'center',
+  },
+  galleryIcon: {
+    height: 35,
+    width: 35,
   },
   inputContainer: {
     justifyContent: 'flex-end',
+  },
+  inputRow: {
+    flexDirection: 'row',
   },
   textInput: {
     borderRadius: 20,
