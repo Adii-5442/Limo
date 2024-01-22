@@ -1,42 +1,114 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
-import {TextInput, Button} from 'react-native-paper';
+import {View,TextInput, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 
 const Home = () => {
-  const [text, setText] = useState('');
+  const [inputText, setInputText] = useState<string>('');
+  const [micActive, setmicActive] = useState<true | false>(false)
+  const [showMic, setshowMic] = useState<true|false>(true)
+
+  const handleTextChange = (text:string) => {
+    if (text.length == 0) {
+
+      setshowMic(true)
+    } else {
+      setshowMic(false)
+    }
+    setInputText(text);
+
+  }
+
+
+  const handleMicPress = () => {
+    setmicActive(!micActive)
+  }
 
   return (
     <View style={styles.container}>
       <View style={{flexDirection: 'column', flex: 0.09}}>
         <View style={styles.headerContainer}>
-          <Image
-            style={{height: 35, width: 35, margin: 10}}
-            source={require('../assets/menu.png')}
-          />
+          <TouchableOpacity
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginLeft: 5,
+              marginTop: '5%',
+            }}>
+            <Image
+              style={{
+                height: 35,
+                width: 35,
+              }}
+              source={require('../assets/menu1.png')}
+            />
+          </TouchableOpacity>
           <Text
             style={{
               fontSize: 20,
               fontWeight: '700',
               color: 'white',
-              marginTop: 15,
+              marginTop: '5%',
             }}>
-            Limooo
+            L I M O
           </Text>
-          <Image
-            style={{height: 35, width: 35, margin: 10}}
-            source={require('../assets/threeDot.png')}
-          />
+          <TouchableOpacity
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginRight: 5,
+              marginTop: '5%',
+            }}>
+            <Image
+              style={{height: 35, width: 35}}
+              source={require('../assets/threeDotMenu.png')}
+            />
+          </TouchableOpacity>
         </View>
-        <View style={styles.line} />
       </View>
 
       <View style={styles.inputContainer}>
-        <TextInput
-          label="Type Here"
-          style={styles.textInput}
-          value={text}
-          onChangeText={text => setText(text)}
-        />
+        <View style={{flexDirection: 'row'}}>
+          <TextInput
+            placeholder='Type Here'
+            textBreakStrategy='balanced'
+            style={styles.textInput}
+            value={inputText}
+            textAlignVertical="top"
+            autoFocus={true}
+            // numberOfLines={4}
+            multiline={true}
+            underlineColorAndroid={'transparent'}
+            onChangeText={(text)=>handleTextChange(text)}/>
+          <TouchableOpacity
+            onPress={handleMicPress}
+            style={{
+              borderRadius: 20,
+              marginBottom: 10,
+              alignSelf: 'center',
+            }}>
+            <Image
+              style={{height: 35, width: 35}}
+              source={
+                showMic?
+                  micActive
+                  ? require('../assets/micActive2.png')
+                    : require('../assets/micInactive.png') :
+                  require('../assets/send.png')
+              }
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              borderRadius: 20,
+              marginBottom: 10,
+              marginLeft: 5,
+              alignSelf: 'center',
+            }}>
+            <Image
+              style={{height: 35, width: 35}}
+              source={require('../assets/gallery.png')}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -67,10 +139,17 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderRadius: 20,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+    textAlignVertical: 'center',
+    fontWeight: '500',
+    fontSize:15,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     margin: 5,
-    width: '80%',
+    width: '75%',
     marginBottom: 10,
   },
 });
