@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'grey',
     height: 2,
     alignSelf: 'stretch', // Take full width
-      marginHorizontal: 10, // Adjust the margin as needed
+      marginHorizontal: 10, // Adjuset the margin as needed
       marginVertical: 10,
     borderRadius:50,
   },
