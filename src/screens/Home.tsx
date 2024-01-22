@@ -70,6 +70,7 @@ const Home = () => {
           <TextInput
             placeholder='Type Here'
             textBreakStrategy='balanced'
+            placeholderTextColor={'grey'}
             style={styles.textInput}
             value={inputText}
             textAlignVertical="top"
@@ -141,6 +142,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: 'white',
     alignItems: 'center',
+    color: 'black',
+    borderWidth: 1.5,
+    borderColor:'cyan',
     paddingHorizontal: 10,
     justifyContent: 'center',
     textAlignVertical: 'center',
