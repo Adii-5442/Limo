@@ -6,8 +6,31 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  ScrollView,
+  FlatList,
 } from 'react-native';
 import Voice from '@react-native-voice/voice';
+
+const dummy = [
+  {
+    id: '1',
+    user: 'model',
+    messsage: 'Hey Welcome!',
+    time: new Date(),
+  },
+  {
+    id: '2',
+    user: 'user',
+    messsage: 'Hey Thnaks! can u answer few questions on mine',
+    time: new Date(),
+  },
+  {
+    id: '3',
+    user: 'model',
+    messsage: 'Y sure!, go on',
+    time: new Date(),
+  },
+];
 
 const Home = () => {
   const [inputText, setInputText] = useState<string>('');
@@ -16,6 +39,8 @@ const Home = () => {
 
   const [isListening, setisListening] = useState(false);
   const [RecognizedSpeech, setRecognizedSpeech] = useState('');
+
+  const [messages, setMessages] = useState(dummy)
 
   useEffect(() => {
     Voice.onSpeechStart = onSpeechStart;
@@ -78,6 +103,54 @@ const Home = () => {
   const handleMicPress = () => {
     setmicActive(!micActive);
   };
+  const renderMessageItem = ({item, index}) => {
+    if (item.user === 'user') {
+      return (
+        <View
+          style={{
+            // backgroundColor: '#0078fe',
+            borderWidth: 1.5,
+            borderColor: '#797d7a',
+            padding: 10,
+            marginLeft: '45%',
+            borderRadius: 15,
+            marginTop: 5,
+            marginRight: '5%',
+            maxWidth: '80%',
+            alignSelf: 'flex-end',
+          }}
+          key={index}>
+          <Text style={{fontSize: 16, color: '#fff'}} key={index}>
+            {' '}
+            {item.messsage}
+          </Text>
+        </View>
+      );
+    } else {
+      return (
+        <View
+          style={{
+            //backgroundColor: '#dedede',
+            borderWidth: 1.5,
+            borderColor: '#018280',
+            padding: 10,
+            marginTop: 5,
+            marginLeft: '5%',
+            maxWidth: '80%',
+            alignSelf: 'flex-start',
+            borderRadius: 15,
+          }}
+          key={index}>
+          <Text
+            style={{fontSize: 16, color: '#fff', justifyContent: 'center'}}
+            key={index}>
+            {' '}
+            {item.messsage}
+          </Text>
+        </View>
+      );
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -96,6 +169,12 @@ const Home = () => {
           />
         </TouchableOpacity>
       </View>
+      <FlatList
+        data={messages}
+        style={{marginTop:'5%'}}
+        renderItem={renderMessageItem}
+        keyExtractor={(item, index) => index.toString()}
+      />
 
       <View style={styles.inputContainer}>
         <View style={styles.inputRow}>
@@ -169,6 +248,52 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: 'white',
   },
+  rightArrow: {
+  position: "absolute",
+  backgroundColor: "#0078fe",
+  //backgroundColor:"red",
+  width: 20,
+  height: 25,
+  bottom: 0,
+  borderBottomLeftRadius: 25,
+  right: -10
+},
+
+rightArrowOverlap: {
+  position: "absolute",
+  backgroundColor: "#eeeeee",
+  //backgroundColor:"green",
+  width: 20,
+  height: 35,
+  bottom: -6,
+  borderBottomLeftRadius: 18,
+  right: -20
+
+},
+
+/*Arrow head for recevied messages*/
+leftArrow: {
+    position: "absolute",
+    backgroundColor: "#dedede",
+    //backgroundColor:"red",
+    width: 20,
+    height: 25,
+    bottom: 0,
+    borderBottomRightRadius: 25,
+    left: -10
+},
+
+leftArrowOverlap: {
+    position: "absolute",
+    backgroundColor: "#eeeeee",
+    //backgroundColor:"green",
+    width: 20,
+    height: 35,
+    bottom: -6,
+    borderBottomRightRadius: 18,
+    left: -20
+
+},
   buttonContainer: {
     flexDirection: 'row',
     alignContent: 'space-between',
