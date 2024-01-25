@@ -12,6 +12,7 @@ import {
 import Voice from '@react-native-voice/voice';
 import axios from 'axios';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { Wave } from 'react-native-animated-spinkit';
 
 
 
@@ -45,44 +46,60 @@ const Home = () => {
   const [inputText, setInputText] = useState<string>('');
   const [micActive, setmicActive] = useState<true | false>(false);
   const [showMic, setshowMic] = useState<true | false>(true);
+  const [AILoader, setAILoader] = useState<boolean>(false)
 
   const [isListening, setisListening] = useState(false);
   const [RecognizedSpeech, setRecognizedSpeech] = useState('');
 
   const [messages, setMessages] = useState(dummy)
 
-  const fetchData = async (inputText: string) => {
+  const sendMessage = async (inputText: string) => {
 
-    setInputText("")
+    setInputText('');
 
-    setMessages((prevMessage)=>[
+
+
+    setMessages(prevMessage => [
       ...prevMessage,
       {
         id: (prevMessage.length + 1).toString(),
         user: 'user',
         messsage: inputText,
-        time: new Date()
-      },
-    ]);
-
-    const model = genAI.getGenerativeModel({ model: "gemini-pro"});
-
-    const prompt = "Write a story about a magic backpack."
-
-    const result = await model.generateContent(inputText);
-    const response = await result.response;
-    const text = response.text();
-    console.log(text);
-    setMessages((prevMessage)=>[
-      ...prevMessage,
-      {
-        id: (messages.length + 1).toString(),
-        user: 'model',
-        messsage: text,
         time: new Date(),
       },
     ]);
+    await getResponse(inputText).then(() => {
+      setAILoader(false)
+    })
+
+
+
+  };
+  const getResponse = async (inputText: string) => {
+    try {
+      setAILoader(true);
+      const model = genAI.getGenerativeModel({model: 'gemini-pro'});
+      const result = await model.generateContent(inputText);
+      const response = await result.response;
+      const text = response.text();
+      setMessages(prevMessage => [
+        ...prevMessage,
+        {
+          id: (prevMessage.length + 1).toString(),
+          user: 'model',
+          messsage: text,
+          time: new Date(),
+        },
+      ]);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setAILoader(false);
+    }
+
   }
+
+
 
 
 
@@ -148,7 +165,9 @@ const Home = () => {
   const handleMicPress = () => {
     setmicActive(!micActive);
   };
-  const renderMessageItem = ({item, index}) => {
+  const renderMessageItem = ({ item, index }) => {
+
+
     if (item.user === 'user') {
       return (
         <View
@@ -159,16 +178,22 @@ const Home = () => {
             padding: 10,
             marginLeft: '45%',
             borderRadius: 15,
-            marginTop: 8,
+            marginTop: '5%',
             marginRight: '5%',
             maxWidth: '80%',
             alignSelf: 'flex-end',
           }}
           key={index}>
-          <Text style={{fontSize: 16, color: '#fff'}} key={index}>
+          <Text selectable={true} style={{fontSize: 16, color: '#fff'}} key={index}>
             {' '}
             {item.messsage}
           </Text>
+        </View>
+      );
+    }else if (item.user === 'user' && index === messages.length - 1 && AILoader) {
+      return (
+        <View style={{marginLeft: '5%'}}>
+          <Wave size={50} color="#018280" />
         </View>
       );
     } else {
@@ -179,7 +204,7 @@ const Home = () => {
             borderWidth: 1.5,
             borderColor: '#018280',
             padding: 10,
-            marginTop: 5,
+            marginTop: '5%',
             marginLeft: '5%',
             maxWidth: '80%',
             alignSelf: 'flex-start',
@@ -187,6 +212,7 @@ const Home = () => {
           }}
           key={index}>
           <Text
+            selectable={true}
             style={{fontSize: 16, color: '#fff', justifyContent: 'center'}}
             key={index}>
             {' '}
@@ -243,7 +269,7 @@ const Home = () => {
                 showMic?
                   isListening ? stopListening() : startListening()
                   :
-                  fetchData(inputText)
+                  sendMessage(inputText)
               }}
               style={styles.micButton}>
               <Image
