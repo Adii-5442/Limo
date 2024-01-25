@@ -10,6 +10,14 @@ import {
   FlatList,
 } from 'react-native';
 import Voice from '@react-native-voice/voice';
+import axios from 'axios';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+
+
+const GEMINI_API_KEY = 'AIzaSyBTYU40ZurVNGA_c1wN8gQywiy3lFCVByE';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
 
 const dummy = [
   {
@@ -32,6 +40,7 @@ const dummy = [
   },
 ];
 
+
 const Home = () => {
   const [inputText, setInputText] = useState<string>('');
   const [micActive, setmicActive] = useState<true | false>(false);
@@ -41,6 +50,42 @@ const Home = () => {
   const [RecognizedSpeech, setRecognizedSpeech] = useState('');
 
   const [messages, setMessages] = useState(dummy)
+
+  const fetchData = async (inputText: string) => {
+
+    setInputText("")
+
+    setMessages((prevMessage)=>[
+      ...prevMessage,
+      {
+        id: (prevMessage.length + 1).toString(),
+        user: 'user',
+        messsage: inputText,
+        time: new Date()
+      },
+    ]);
+
+    const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+
+    const prompt = "Write a story about a magic backpack."
+
+    const result = await model.generateContent(inputText);
+    const response = await result.response;
+    const text = response.text();
+    console.log(text);
+    setMessages((prevMessage)=>[
+      ...prevMessage,
+      {
+        id: (messages.length + 1).toString(),
+        user: 'model',
+        messsage: text,
+        time: new Date(),
+      },
+    ]);
+  }
+
+
+
 
   useEffect(() => {
     Voice.onSpeechStart = onSpeechStart;
@@ -114,7 +159,7 @@ const Home = () => {
             padding: 10,
             marginLeft: '45%',
             borderRadius: 15,
-            marginTop: 5,
+            marginTop: 8,
             marginRight: '5%',
             maxWidth: '80%',
             alignSelf: 'flex-end',
@@ -195,7 +240,10 @@ const Home = () => {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               onPress={() => {
-                isListening ? stopListening() : startListening();
+                showMic?
+                  isListening ? stopListening() : startListening()
+                  :
+                  fetchData(inputText)
               }}
               style={styles.micButton}>
               <Image
